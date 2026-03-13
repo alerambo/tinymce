@@ -523,9 +523,17 @@ setDocument = Sizzle.setDocument = function (node) {
   if (parent && parent !== getTop(parent)) {
     // IE11 does not have attachEvent, so all must suffer
     if (parent.addEventListener) {
-      parent.addEventListener('unload', () => {
-        setDocument();
-      }, false);
+      if ('onpagehide' in window) {
+        parent.addEventListener('pagehide', (evt) => {
+          if (!evt.persisted) {
+            setDocument();
+          }
+        }, false);
+      } else {
+        parent.addEventListener('unload', () => {
+          setDocument();
+        }, false);
+      }
     } else if (parent.attachEvent) {
       parent.attachEvent('onunload', () => {
         setDocument();
